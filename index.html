@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RATE CARD</title>
+<style>
+:root{--accent:#00e5c3;--bg:#071018;--card:rgba(10,20,32,.80);--text:#fff}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif;background:#071018}
+#wall{position:fixed;inset:0;z-index:-2;background:radial-gradient(circle at 20% 10%,rgba(0,229,195,.18),transparent 32%),radial-gradient(circle at 85% 80%,rgba(124,92,255,.20),transparent 35%),linear-gradient(135deg,#050a11,#101827);background-size:cover;background-position:center}
+#wall:after{content:"";position:absolute;inset:0;background:rgba(0,0,0,.30)}
+.wrap{width:min(1050px,94%);margin:auto;padding:20px 0 45px}.top{text-align:right}.btn{border:1px solid #ffffff22;background:#ffffff12;color:#fff;border-radius:11px;padding:10px 14px;cursor:pointer;font-weight:800}.hero{text-align:center}.crown{font-size:42px;animation:f 2s infinite}.hero h1{font-size:clamp(40px,8vw,74px);letter-spacing:7px;margin:0;text-shadow:0 0 24px #00e5c355}.marquee{overflow:hidden;white-space:nowrap;border:1px solid #ffffff18;background:#0005;border-radius:999px;margin:8px auto 22px;max-width:760px}.marquee span{display:inline-block;padding:9px 0;color:var(--accent);font-weight:900;animation:m 12s linear infinite}.profile{text-align:center}.profile img{width:155px;height:155px;border-radius:50%;object-fit:cover;border:4px solid var(--accent);box-shadow:0 0 0 7px #00e5c314,0 0 35px #00e5c355;background:#172333}.card{margin:16px 0;padding:18px;border:1px solid #ffffff18;border-radius:22px;background:var(--card);backdrop-filter:blur(14px);box-shadow:0 18px 45px #0005}.rate{display:grid;grid-template-columns:1fr auto;align-items:center;padding:16px;border-radius:15px;background:#ffffff08;border:1px solid #ffffff0c;margin:9px 0}.platform{display:flex;align-items:center;gap:12px;font-weight:900}.ico{width:40px;height:40px;display:grid;place-items:center;border-radius:12px;background:linear-gradient(135deg,var(--accent),#7c5cff);color:#061017;font-size:21px}.price{color:var(--accent);font-size:21px;font-weight:900}.accounts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.account{padding:15px;border-radius:15px;background:#ffffff08;border:1px solid #ffffff0c;color:#fff;text-decoration:none}.account b{display:block;color:var(--accent);margin-bottom:6px}.note{line-height:1.7}.muted{color:#aab7c5;font-size:13px}footer{text-align:center;color:#8090a0;font-size:12px;margin-top:25px}@keyframes m{from{transform:translateX(100%)}to{transform:translateX(-100%)}}@keyframes f{50%{transform:translateY(-6px)}}@media(max-width:700px){.accounts{grid-template-columns:1fr}.rate{grid-template-columns:1fr;gap:8px}.price{font-size:19px}}
+</style>
+</head>
+<body>
+<div id="wall"></div><div class="wrap">
+<div class="top"><button class="btn" onclick="location.href='admin.html'">⚙ ADMIN</button></div>
+<header class="hero"><div class="crown">👑</div><h1 id="title">RATE CARD</h1><div class="marquee"><span id="marquee">MEMUAT RATE CARD...</span></div></header>
+<div class="profile"><img id="profile" alt="Foto Profil"></div>
+<section class="card"><div id="rates"></div></section>
+<section class="card"><h2>🔗 AKUN SOSMED</h2><div class="accounts" id="accounts"></div></section>
+<section class="card"><h2>📝 Keterangan informasi terbaru</h2><div id="note" class="note"></div></section>
+<footer>RATE CARD ONLINE PREMIUM</footer>
+</div>
+<script>
+const fallback={title:"RATE CARD",marquee:"PREMIUM RATE CARD • UPDATE TERBARU • SILAKAN CEK HARGA & INFORMASI",accent:"#00e5c3",bg:"#071018",profile:"",rates:[["📘","FACEBOOK","Rp 0"],["◎","INSTAGRAM","Rp 0"],["▶","REELS FACEBOOK","Rp 0"],["♪","TIKTOK","Rp 0"],["★","ALL SOSMED","Rp 0"]],accounts:[["FACEBOOK","Nama akun Facebook",""],["INSTAGRAM","Nama akun Instagram",""],["TIKTOK","Nama akun TikTok",""]],note:"Silakan isi keterangan terbaru melalui Admin."};
+const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+function url(s){try{let u=new URL(s);return /^https?:$/.test(u.protocol)?u.href:"#"}catch{return "#"}}
+function draw(d){
+document.documentElement.style.setProperty("--accent",d.accent||fallback.accent);
+document.getElementById("wall").style.backgroundColor=d.bg||fallback.bg;
+if(d.wall)document.getElementById("wall").style.backgroundImage=`url("${d.wall}")`;
+document.getElementById("title").textContent=d.title;document.getElementById("marquee").textContent=d.marquee;
+document.getElementById("profile").src=d.profile||"data:image/svg+xml;charset=utf-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="155" height="155"><rect width="100%" height="100%" fill="#172333"/><text x="50%" y="54%" fill="white" font-size="22" text-anchor="middle">PROFILE</text></svg>');
+document.getElementById("rates").innerHTML=d.rates.map(x=>`<div class="rate"><div class="platform"><span class="ico">${esc(x[0])}</span>${esc(x[1])}</div><div class="price">${esc(x[2])}</div></div>`).join("");
+document.getElementById("accounts").innerHTML=d.accounts.map(x=>`<a class="account" href="${url(x[2])}" target="_blank" rel="noopener"><b>${esc(x[0])}</b>${esc(x[1])}</a>`).join("");
+document.getElementById("note").textContent=d.note||"";
+}
+fetch("/api/config").then(r=>r.ok?r.json():Promise.reject()).then(draw).catch(()=>draw(fallback));
+</script>
+</body></html>

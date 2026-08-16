@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RATE CARD — ADMIN</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#071018;color:#fff;font-family:Inter,Segoe UI,Arial,sans-serif}.wrap{width:min(1000px,94%);margin:auto;padding:25px 0 50px}h1{margin:0 0 5px}.card{background:#0d1825;border:1px solid #ffffff16;border-radius:18px;padding:18px;margin:15px 0;box-shadow:0 15px 40px #0005}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:flex;flex-direction:column;gap:6px}.field label{font-weight:800;color:#aab7c5;font-size:13px}.field input,.field textarea{width:100%;padding:11px;border-radius:10px;border:1px solid #ffffff1c;background:#07111c;color:#fff}.field textarea{min-height:120px}.btn{padding:11px 15px;border:0;border-radius:10px;background:#00e5c3;color:#061017;font-weight:900;cursor:pointer}.btn.secondary{background:#ffffff14;color:#fff}.btn.danger{background:#8b2635;color:#fff}.row{display:flex;gap:10px;flex-wrap:wrap}.msg{padding:11px;border-radius:10px;margin-top:10px;display:none}.ok{background:#0b453d}.err{background:#51202a}.hidden{display:none}.muted{color:#9eabb8;font-size:13px}.login{max-width:430px;margin:80px auto}.brand{text-align:center;margin-bottom:20px}a{color:#00e5c3}
+@media(max-width:700px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body><div class="wrap">
+<section id="login" class="card login"><div class="brand"><div style="font-size:42px">👑</div><h1>RATE CARD ADMIN</h1><div class="muted">Login pengelola website</div></div>
+<div class="field"><label>Username</label><input id="user" autocomplete="username"></div><br>
+<div class="field"><label>Password</label><input id="pass" type="password" autocomplete="current-password"></div><br>
+<button class="btn" onclick="login()">LOGIN</button><div id="loginMsg" class="msg err"></div>
+</section>
+
+<section id="panel" class="hidden">
+<div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><div><h1>⚙️ ADMIN SETTINGS</h1><div class="muted">Update tersimpan di database online dan dibaca oleh halaman Viewer.</div></div><button class="btn secondary" onclick="logout()">Keluar</button></div>
+<div class="card"><h2>🎨 Tampilan</h2><div class="grid">
+<div class="field"><label>Judul</label><input id="title"></div>
+<div class="field"><label>Teks bergerak</label><input id="marquee"></div>
+<div class="field"><label>Warna aksen</label><input id="accent" type="color"></div>
+<div class="field"><label>Warna background</label><input id="bg" type="color"></div>
+</div></div>
+<div class="card"><h2>💰 Harga</h2><div class="grid" id="prices"></div></div>
+<div class="card"><h2>🔗 Akun Sosmed</h2><div class="grid" id="socials"></div></div>
+<div class="card"><h2>📝 Keterangan informasi terbaru</h2><div class="field"><textarea id="note"></textarea></div></div>
+<div class="card"><h2>🖼️ Media</h2><div class="grid">
+<div><div class="muted">Foto profil</div><input id="profileFile" type="file" accept="image/*"><div id="profileStatus" class="muted"></div></div>
+<div><div class="muted">Wallpaper</div><input id="wallFile" type="file" accept="image/*"><div id="wallStatus" class="muted"></div></div>
+</div></div>
+<div class="card"><div class="row"><button class="btn" onclick="save()">💾 SIMPAN SEMUA</button><button class="btn danger" onclick="resetData()">↺ RESET</button><a class="btn secondary" href="/" style="text-decoration:none">👁 Lihat Viewer</a></div><div id="msg" class="msg"></div></div>
+</section>
+</div>
+<script>
+let token=sessionStorage.getItem("rate_admin_token"), data=null;
+const fallback={title:"RATE CARD",marquee:"PREMIUM RATE CARD • UPDATE TERBARU • SILAKAN CEK HARGA & INFORMASI",accent:"#00e5c3",bg:"#071018",profile:"",wall:"",rates:[["📘","FACEBOOK","Rp 0"],["◎","INSTAGRAM","Rp 0"],["▶","REELS FACEBOOK","Rp 0"],["♪","TIKTOK","Rp 0"],["★","ALL SOSMED","Rp 0"]],accounts:[["FACEBOOK","Nama akun Facebook",""],["INSTAGRAM","Nama akun Instagram",""],["TIKTOK","Nama akun TikTok",""]],note:"Silakan isi keterangan terbaru melalui Admin."};
+const $=id=>document.getElementById(id);
+function showMsg(t,ok=true){let e=$("msg");e.textContent=t;e.className="msg "+(ok?"ok":"err");e.style.display="block"}
+function login(){fetch("/api/admin",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"login",username:$("user").value,password:$("pass").value})}).then(r=>r.json()).then(x=>{if(x.token){token=x.token;sessionStorage.setItem("rate_admin_token",token);openPanel()}else{$("loginMsg").textContent=x.error||"Login gagal";$("loginMsg").style.display="block"}}).catch(()=>{$("loginMsg").textContent="Server tidak dapat dihubungi";$("loginMsg").style.display="block"})}
+function openPanel(){ $("login").classList.add("hidden");$("panel").classList.remove("hidden");load() }
+function logout(){sessionStorage.removeItem("rate_admin_token");location.reload()}
+async function load(){let r=await fetch("/api/config");data=await r.json();fill()}
+function fill(){
+$("title").value=data.title;$("marquee").value=data.marquee;$("accent").value=data.accent;$("bg").value=data.bg;$("note").value=data.note||"";
+$("prices").innerHTML=data.rates.map((x,i)=>`<div class="field"><label>${x[1]}</label><input data-rate="${i}" value="${x[2]}"></div>`).join("");
+$("socials").innerHTML=data.accounts.map((x,i)=>`<div class="field"><label>${x[0]} — Nama akun</label><input data-name="${i}" value="${x[1]}"><label>Link website</label><input data-link="${i}" value="${x[2]}"></div>`).join("");
+}
+async function upload(file,type){
+if(!file)return null; if(file.size>5*1024*1024)throw Error("Ukuran gambar maksimal 5 MB.");
+let fd=new FormData();fd.append("file",file);fd.append("type",type);
+let r=await fetch("/api/upload",{method:"POST",headers:{Authorization:"Bearer "+token},body:fd});let x=await r.json();if(!r.ok)throw Error(x.error||"Upload gagal");return x.url;
+}
+async function save(){
+try{
+let pf=await upload($("profileFile").files[0],"profile"), wf=await upload($("wallFile").files[0],"wall"); if(pf)data.profile=pf;if(wf)data.wall=wf;
+data.title=$("title").value;data.marquee=$("marquee").value;data.accent=$("accent").value;data.bg=$("bg").value;data.note=$("note").value;
+document.querySelectorAll("[data-rate]").forEach(e=>data.rates[+e.dataset.rate][2]=e.value);
+document.querySelectorAll("[data-name]").forEach(e=>data.accounts[+e.dataset.name][1]=e.value);
+document.querySelectorAll("[data-link]").forEach(e=>data.accounts[+e.dataset.link][2]=e.value);
+let r=await fetch("/api/admin",{method:"PUT",headers:{"Content-Type":"application/json",Authorization:"Bearer "+token},body:JSON.stringify(data)});
+let x=await r.json();if(!r.ok)throw Error(x.error||"Gagal menyimpan");data=x.data;fill();showMsg("✅ Berhasil disimpan. Semua viewer sekarang membaca data terbaru.");$("profileStatus").textContent=pf?"Foto profil berhasil diupload.":"";$("wallStatus").textContent=wf?"Wallpaper berhasil diupload.":"";
+}catch(e){showMsg("❌ "+e.message,false)}
+}
+async function resetData(){if(!confirm("Reset semua data ke default?"))return;let r=await fetch("/api/admin",{method:"PUT",headers:{"Content-Type":"application/json",Authorization:"Bearer "+token},body:JSON.stringify(fallback)});let x=await r.json();if(r.ok){data=x.data;fill();showMsg("Data direset.")}else showMsg(x.error||"Gagal",false)}
+if(token)openPanel();
+</script></body></html>
