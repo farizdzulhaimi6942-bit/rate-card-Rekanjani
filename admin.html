@@ -2,125 +2,63 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RATE CARD ADMIN - LOGIN</title>
-    <style>
-        body {
-            background-color: #0b111e;
-            color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .login-card {
-            background-color: #121d33;
-            border-radius: 12px;
-            padding: 40px;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-            text-align: center;
-            border: 1px solid #1e2d4a;
-        }
-        .login-card h2 {
-            margin: 10px 0 5px 0;
-            font-size: 24px;
-            letter-spacing: 1px;
-        }
-        .login-card p {
-            color: #64748b;
-            font-size: 14px;
-            margin-bottom: 30px;
-        }
-        .form-group {
-            text-align: left;
-            margin-bottom: 20px;
-        }
-        .form-group label {
-            display: block;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #94a3b8;
-        }
-        .form-group input {
-            width: 100%;
-            padding: 12px;
-            border-radius: 6px;
-            border: 1px solid #1e2d4a;
-            background-color: #0b111e;
-            color: #ffffff;
-            font-size: 14px;
-            box-sizing: border-box;
-        }
-        .btn-login {
-            width: 100%;
-            padding: 14px;
-            background-color: #00f2fe;
-            border: none;
-            border-radius: 6px;
-            color: #0b111e;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .btn-login:hover {
-            background-color: #4facfe;
-            box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
-        }
-        .error-message {
-            background-color: rgba(239, 68, 68, 0.2);
-            border: 1px solid #ef4444;
-            color: #fca5a5;
-            padding: 12px;
-            border-radius: 6px;
-            font-size: 14px;
-            margin-top: 20px;
-            display: none;
-            text-align: left;
-        }
-        .crown { font-size: 32px; color: #f59e0b; }
-    </style>
+    <title>Rate Card Admin</title>
+    <!-- 1. LETAKKAN SCRIPT NETLIFY WIDGET DI SINI (DI DALAM HEAD) -->
+    </script>
 </head>
 <body>
 
-    <div class="login-card">
-        <div class="crown">👑</div>
+    <!-- STRUKTUR FORM LOGIN ANDA -->
+    <div class="login-container">
         <h2>RATE CARD ADMIN</h2>
         <p>Login pengelola website</p>
 
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="password">Password Dashboard</label>
-                <input type="password" id="password" placeholder="••••••••" required>
-            </div>
-            <button type="submit" class="btn-login">LOGIN</button>
-        </form>
+        <!-- 2. PASTIKAN TAG FORM ANDA MEMILIKI ID SEPERTI INI -->
+        <form id="login-form">
+            
+            <label>Email Admin</label>
+            <!-- Ubah type="text" menjadi type="email" dan tambahkan id="login-email" -->
+            <input type="email" id="login-email" required>
 
-        <div class="error-message" id="errorMsg">Password salah! Silakan coba lagi.</div>
+            <label>Password</label>
+            <!-- Tambahkan id="login-password" -->
+            <input type="password" id="login-password" required>
+
+            <!-- Tambahkan id="login-btn" -->
+            <button type="submit" id="login-btn">LOGIN</button>
+            
+        </form>
     </div>
 
+    <!-- 3. LETAKKAN LOGIKA JAVASCRIPT DI SINI (SEBELUM TAG PENUTUP BODY) -->
     <script>
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const passwordInput = document.getElementById('password').value;
-            const errorElement = document.getElementById('errorMsg');
+      const loginForm = document.getElementById('login-form');
 
-            errorElement.style.display = 'none';
+      if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {
+          e.preventDefault(); // Mencegah halaman refresh otomatis
 
-            // KATA SANDI AMAN & STABIL TANPA DATABASE
-            if (passwordInput === 'bismillah123') {
-                alert('Login Berhasil!');
-                window.location.href = 'index.html'; // Langsung masuk ke halaman utama pengeditan Anda
-            } else {
-                errorElement.style.display = 'block';
-            }
+          const email = document.getElementById('login-email').value;
+          const password = document.getElementById('login-password').value;
+          const button = document.getElementById('login-btn');
+
+          button.innerText = "Memproses...";
+          button.disabled = true;
+
+          // Memanggil sistem autentikasi Netlify Identity
+          netlifyIdentity.gotrue.login(email, password)
+            .then(response => {
+              alert("Login Berhasil! Selamat datang Admin.");
+              // Alihkan ke halaman pengeditan data Anda (misal: dashboard-input.html)
+              window.location.href = "/dashboard-input.html"; 
+            })
+            .catch(error => {
+              alert("Login Gagal: " + error.message);
+              button.innerText = "LOGIN";
+              button.disabled = false;
+            });
         });
+      }
     </script>
-
 </body>
 </html>
